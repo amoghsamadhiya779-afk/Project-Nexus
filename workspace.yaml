@@ -1,0 +1,9 @@
+# =============================================================================
+# Nexus Platform - Dagster Workspace Configuration
+# Tells the Dagster daemon (dagit) where to find our ML pipeline definitions.
+# =============================================================================
+
+load_from:
+  - python_file:
+      relative_path: "services/recommender/training/dagster_pipeline.py"
+      attribute: "defs"
