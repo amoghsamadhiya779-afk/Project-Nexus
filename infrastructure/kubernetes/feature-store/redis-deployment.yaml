@@ -1,0 +1,59 @@
+# =============================================================================
+# Nexus Online Feature Store (Redis)
+# Stateful deployment targeted at memory-optimized K8s nodes.
+# =============================================================================
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nexus-redis-store
+  namespace: nexus-feature-store
+spec:
+  serviceName: "redis-headless"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nexus-redis
+  template:
+    metadata:
+      labels:
+        app: nexus-redis
+    spec:
+      nodeSelector:
+        workload_type: "data-intensive"
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        command: ["redis-server", "--appendonly", "yes", "--maxmemory", "8gb", "--maxmemory-policy", "allkeys-lru"]
+        ports:
+        - containerPort: 6379
+          name: redis
+        resources:
+          requests:
+            cpu: "2000m"
+            memory: "8Gi"
+          limits:
+            cpu: "4000m"
+            memory: "12Gi"
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: redis-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 50Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nexus-redis-svc
+  namespace: nexus-feature-store
+spec:
+  ports:
+  - port: 6379
+    targetPort: 6379
+  selector:
+    app: nexus-redis

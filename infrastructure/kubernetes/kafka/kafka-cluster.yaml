@@ -1,0 +1,64 @@
+# =============================================================================
+# Nexus Streaming Bus (Kafka/Redpanda)
+# Uses Redpanda for a ZooKeeper-free, high-throughput streaming backend.
+# =============================================================================
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nexus-redpanda
+  namespace: nexus-streaming
+spec:
+  serviceName: "redpanda-headless"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: redpanda
+  template:
+    metadata:
+      labels:
+        app: redpanda
+    spec:
+      containers:
+      - name: redpanda
+        image: redpandadata/redpanda:v23.1.2
+        args:
+          - redpanda
+          - start
+          - --smp 2
+          - --memory 4G
+          - --reserve-memory 0M
+          - --overprovisioned
+          - --node-id $(POD_NAME)
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        ports:
+        - containerPort: 9092
+          name: kafka
+        - containerPort: 9644
+          name: admin
+        volumeMounts:
+        - name: redpanda-data
+          mountPath: /var/lib/redpanda/data
+  volumeClaimTemplates:
+  - metadata:
+      name: redpanda-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 100Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nexus-kafka-bootstrap
+  namespace: nexus-streaming
+spec:
+  ports:
+  - port: 9092
+    targetPort: 9092
+  selector:
+    app: redpanda

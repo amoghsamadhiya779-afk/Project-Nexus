@@ -1,0 +1,73 @@
+# =============================================================================
+# Nexus Serving Gateway - Kubernetes Deployment
+# High-availability configuration with auto-scaling, resource limits, and probes.
+# =============================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nexus-serving-gateway
+  namespace: nexus-serving
+  labels:
+    app: nexus-serving-gateway
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nexus-serving-gateway
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: nexus-serving-gateway
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: gateway
+        image: nexus-registry/serving-gateway:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          name: http-api
+        resources:
+          requests:
+            cpu: "1000m"
+            memory: "2Gi"
+          limits:
+            cpu: "2000m"
+            memory: "4Gi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        envFrom:
+        - secretRef:
+            name: nexus-serving-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nexus-serving-gateway-svc
+  namespace: nexus-serving
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: nexus-serving-gateway
