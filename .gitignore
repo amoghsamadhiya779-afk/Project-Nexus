@@ -1,16 +1,90 @@
-﻿.venv/
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-*.egg-info/
-dist/
+# =============================================================================
+# Nexus Platform - Master Gitignore Setup
+# =============================================================================
+
+# ── Environment & Secrets ───────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+*.env
+secrets.json
+
+# ── Python Dependencies & Virtual Environments ──────────────────────────────
+.venv/
+venv/
+ENV/
+env/
+Active.prv
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ── Python Build & Packaging ────────────────────────────────────────────────
 build/
-*.log
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ── Python Caches & Runtimes ────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.tox/
+.nox/
+.coverage
+.cache
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints
+
+# ── Data & Model Artifacts (Crucial for RecSys Ops) ────────────────────────
+# Prevents checking in multi-gigabyte simulation and model arrays
+data/
+*.parquet
+*.jsonl
+*.csv
+*.pt
+*.pkl
+*.pickle
+*.faiss
+*.bin
+*.txt.model
+matrix_fact_cache/
+
+# ── MLflow Local Tracking (If run outside isolated docker volume) ──────────
+mlruns/
+mlflow-artifacts/
+*.db
+
+# ── Operating System Garbage ────────────────────────────────────────────────
+Thumbs.db
+Db.id
+Desktop.ini
 .DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# ── IDE & Editor Settings ───────────────────────────────────────────────────
 .vscode/
 .idea/
 *.swp
 *.swo
-.env
+*~
+.project
+.pydevproject
+.settings/
