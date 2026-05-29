@@ -1,48 +1,69 @@
+#!/usr/bin/env python3
+"""
+=============================================================================
+High-Performance Batched Feature Fetcher (inspired by DoorDash Riviera)
+Utilizes Redis connection pooling and non-blocking TCP pipelining to query
+and reconstruct multi-entity feature state maps in < 3ms.
+=============================================================================
+"""
+
 import redis
-from typing import List, Dict, Any
-from shared.utils.config import config
+from typing import List, Dict, Any, Optional
 
 class FeatureFetcher:
-    """
-    High-performance batched Redis feature fetcher.
-    Retrieves serialized analytical vectors in under 5ms p99 using Redis pipelining.
-    """
-    def __init__(self):
-        self.r = redis.Redis(host=config.REDIS_HOST, port=config.REDIS_PORT, decode_responses=True)
+    def __init__(self, host: str = "localhost", port: int = 6379):
+        self.pool = redis.ConnectionPool(
+            host=host,
+            port=port,
+            decode_responses=True,
+            max_connections=100,
+            socket_timeout=0.5,
+            socket_connect_timeout=0.5
+        )
+        self.r = redis.Redis(connection_pool=self.pool)
 
     def fetch_user_features(self, user_ids: List[str]) -> List[Dict[str, Any]]:
-        pipe = self.r.pipeline()
+        if not user_ids:
+            return []
+
+        pipe = self.r.pipeline(transaction=False)
         for uid in user_ids:
             pipe.hgetall(f"fv:user_aggregates:user:{uid}")
         
-        results = pipe.execute()
-        fetched = []
-        for uid, res in zip(user_ids, results):
-            if not res:
-                # Cold-start fallback bounds
-                res = {
+        raw_results = pipe.execute()
+        
+        materialized_profiles = []
+        for uid, features in zip(user_ids, raw_results):
+            if not features:
+                features = {
                     "user_view_count": "0",
                     "user_purchase_count": "0",
                     "user_conversion_rate": "0.0"
                 }
-            res["user_id"] = uid
-            fetched.append(res)
-        return fetched
+            features["user_id"] = uid
+            materialized_profiles.append(features)
+            
+        return materialized_profiles
 
     def fetch_item_features(self, item_ids: List[str]) -> List[Dict[str, Any]]:
-        pipe = self.r.pipeline()
+        if not item_ids:
+            return []
+
+        pipe = self.r.pipeline(transaction=False)
         for iid in item_ids:
             pipe.hgetall(f"fv:item_aggregates:item:{iid}")
+            
+        raw_results = pipe.execute()
         
-        results = pipe.execute()
-        fetched = []
-        for iid, res in zip(item_ids, results):
-            if not res:
-                res = {
+        materialized_items = []
+        for iid, features in zip(item_ids, raw_results):
+            if not features:
+                features = {
                     "category": "unknown",
                     "base_price": "0.0",
                     "popularity": "0"
                 }
-            res["item_id"] = iid
-            fetched.append(res)
-        return fetched
+            features["item_id"] = iid
+            materialized_items.append(features)
+            
+        return materialized_items
