@@ -1,26 +1,15 @@
-# Nexus — Personalized Marketplace Intelligence Platform
+Nexus — Personalized Marketplace Intelligence Platform
 
-> A production-grade, cloud-agnostic ML platform combining a declarative Feature Store, two-tower Recommendation System, Learning-to-Rank Search, causal multi-horizon Forecasting, graph-based Fraud Detection, and a full RecSysOps + Experimentation layer — built entirely on open-source tooling.
+A production-grade, cloud-agnostic ML platform combining a declarative Feature Store, two-tower Recommendation System, Learning-to-Rank Search, causal multi-horizon Forecasting, graph-based Fraud Detection, and a full RecSysOps + Experimentation layer — built entirely on open-source tooling.
 
-[![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-green.svg)](LICENSE)
-[![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-black.svg)](https://github.com/astral-sh/ruff)
-[![Tests](https://img.shields.io/badge/tests-pytest-brightgreen)](tests/)
-[![Docs](https://img.shields.io/badge/docs-mkdocs-blue)](docs/)
+Why This Exists
 
----
-
-## Why This Exists
-
-Most "ML portfolio projects" are Jupyter notebooks with a scikit-learn model and a CSV. Nexus is not that. It is a faithful open-source reimplementation of the production architectures documented in [applied-ml](https://github.com/eugeneyan/applied-ml) — Airbnb's Zipline declarative feature pipelines, Netflix's Fact Store + RecSysOps, LinkedIn's Feathr + DARWIN experimentation, DoorDash's Riviera real-time feature engineering, Uber's causal forecasting, and Pinterest's GPU embedding inference.
+Most "ML portfolio projects" are Jupyter notebooks with a scikit-learn model and a CSV. Nexus is not that. It is a faithful open-source reimplementation of the production architectures documented in applied-ml — Airbnb's Zipline declarative feature pipelines, Netflix's Fact Store + RecSysOps, LinkedIn's Feathr + DARWIN experimentation, DoorDash's Riviera real-time feature engineering, Uber's causal forecasting, and Pinterest's GPU embedding inference.
 
 Every design decision is grounded in a published engineering blog post or paper from a company that runs this at scale.
 
----
+Architecture
 
-## Architecture
-
-```mermaid
 graph TB
     subgraph INGESTION["Data Ingestion Layer"]
         SIM[Data Simulator<br/>10M+ events] --> KAFKA[Kafka / Redpanda<br/>Streaming Bus]
@@ -105,37 +94,142 @@ graph TB
     style SERVING fill:#4a1942,color:#fff
     style EXPERIMENT fill:#3d2e00,color:#fff
     style MLOPS fill:#2d1515,color:#fff
-```
 
----
 
-## Tech Stack Justification
+Tech Stack Justification
 
 Every tool chosen for portability, maturity, and direct correspondence to production systems at top-tier companies.
 
-| Layer | Tool | Why | Inspired by |
-|---|---|---|---|
-| **Streaming** | Kafka / Redpanda | Battle-tested, cloud-agnostic, drop-in compatible | DoorDash, Uber, LinkedIn |
-| **Stream processing** | Apache Flink | Exactly-once semantics, stateful windows, joins | DoorDash Riviera |
-| **Batch processing** | DuckDB + Spark | DuckDB for local dev, Spark for scale-out | Airbnb Zipline, Sputnik |
-| **Online store** | Redis | Sub-5ms feature lookup, pipeline batching | DoorDash Gigascale Feature Store |
-| **Offline store** | PostgreSQL + Parquet | Point-in-time joins, time-travel queries | Netflix Fact Store |
-| **Feature registry** | Custom (Nexus-FS) | Declarative YAML, lineage tracking | Airbnb Zipline, LinkedIn Feathr |
-| **Vector search** | FAISS + Hnswlib | GPU-accelerated ANN, production-tested | Pinterest, Netflix |
-| **Model training** | Ray + PyTorch | Distributed, cloud-agnostic | Uber, Pinterest |
-| **Model registry** | MLflow | OSS standard, UI + API | Zynga, DoorDash |
-| **Orchestration** | Dagster | Asset-based lineage, great observability | Netflix Metaflow-inspired |
-| **Serving** | FastAPI + Triton | Async, GPU inference, model versioning | NVIDIA, Pinterest |
-| **Observability** | Prometheus + Grafana | Industry standard, pull-based, no lock-in | Uber, Airbnb |
-| **Data quality** | Great Expectations | Declarative expectations, CI integration | Airbnb data quality |
-| **Experimentation** | Custom (Nexus-XP) | CUPAC, interleaving, sequential testing | Netflix, LinkedIn |
-| **Infrastructure** | Kubernetes + Helm | Cloud-agnostic, operator-based | Universal |
+Layer
 
----
+Tool
 
-## Monorepo Structure
+Why
 
-```
+Inspired by
+
+Streaming
+
+Kafka / Redpanda
+
+Battle-tested, cloud-agnostic, drop-in compatible
+
+DoorDash, Uber, LinkedIn
+
+Stream processing
+
+Apache Flink
+
+Exactly-once semantics, stateful windows, joins
+
+DoorDash Riviera
+
+Batch processing
+
+DuckDB + Spark
+
+DuckDB for local dev, Spark for scale-out
+
+Airbnb Zipline, Sputnik
+
+Online store
+
+Redis
+
+Sub-5ms feature lookup, pipeline batching
+
+DoorDash Gigascale Feature Store
+
+Offline store
+
+PostgreSQL + Parquet
+
+Point-in-time joins, time-travel queries
+
+Netflix Fact Store
+
+Feature registry
+
+Custom (Nexus-FS)
+
+Declarative YAML, lineage tracking
+
+Airbnb Zipline, LinkedIn Feathr
+
+Vector search
+
+FAISS + Hnswlib
+
+GPU-accelerated ANN, production-tested
+
+Pinterest, Netflix
+
+Model training
+
+Ray + PyTorch
+
+Distributed, cloud-agnostic
+
+Uber, Pinterest
+
+Model registry
+
+MLflow
+
+OSS standard, UI + API
+
+Zynga, DoorDash
+
+Orchestration
+
+Dagster
+
+Asset-based lineage, great observability
+
+Netflix Metaflow-inspired
+
+Serving
+
+FastAPI + Triton
+
+Async, GPU inference, model versioning
+
+NVIDIA, Pinterest
+
+Observability
+
+Prometheus + Grafana
+
+Industry standard, pull-based, no lock-in
+
+Uber, Airbnb
+
+Data quality
+
+Great Expectations
+
+Declarative expectations, CI integration
+
+Airbnb data quality
+
+Experimentation
+
+Custom (Nexus-XP)
+
+CUPAC, interleaving, sequential testing
+
+Netflix, LinkedIn
+
+Infrastructure
+
+Kubernetes + Helm
+
+Cloud-agnostic, operator-based
+
+Universal
+
+Monorepo Structure
+
 nexus/
 ├── services/
 │   ├── feature_store/          # Nexus-FS: declarative feature pipelines
@@ -193,49 +287,49 @@ nexus/
 ├── pyproject.toml              # Monorepo Python config
 ├── docker-compose.yaml         # Local dev stack
 └── Makefile                    # Dev automation
-```
 
----
 
-## Phase-by-Phase Implementation
+Phase-by-Phase Implementation
 
-### Phase 1 — Data & Feature Store (Week 1–2)
+Phase 1 — Data & Feature Store (Week 1–2)
+
 Build the declarative feature pipeline with point-in-time correctness.
-```
+
 make phase1
-```
 
-### Phase 2 — Models & Training (Week 3–4)
+
+Phase 2 — Models & Training (Week 3–4)
+
 Train two-tower recommender, LTR model, forecasting, fraud GNN.
-```
+
 make phase2
-```
 
-### Phase 3 — Real-time Serving (Week 5–6)
+
+Phase 3 — Real-time Serving (Week 5–6)
+
 Deploy inference gateway with < 100ms p99 SLA.
-```
+
 make phase3
-```
 
-### Phase 4 — Experimentation + RecSysOps (Week 7–8)
+
+Phase 4 — Experimentation + RecSysOps (Week 7–8)
+
 Launch A/B testing platform with CUPAC variance reduction.
-```
+
 make phase4
-```
 
-### Phase 5 — Monitoring & Automation (Week 9–10)
+
+Phase 5 — Monitoring & Automation (Week 9–10)
+
 Full observability stack + automatic retraining triggers.
-```
+
 make phase5
-```
 
----
 
-## Quickstart
+Quickstart
 
-```bash
 # 1. Clone
-git clone https://github.com/amoghsamadhiya779-afk/nexus.git && cd nexus
+git clone https://github.com/amoghsamadhiya779-afk/Project-Nexus.git && cd Project-Nexus
 
 # 2. Start local stack (Kafka, Redis, PostgreSQL, MLflow, Grafana)
 make dev-up
@@ -254,63 +348,103 @@ make serve
 
 # 7. Run full test suite
 make test
-```
 
----
 
-## Key Success Metrics
+Key Success Metrics
 
-| Metric | Target | Achieved |
-|---|---|---|
-| Feature serving p99 latency | < 5ms | 3.2ms |
-| Inference gateway p99 latency | < 100ms | 67ms |
-| Recommender Recall@100 | > 0.85 | 0.89 |
-| Search NDCG@10 | > 0.82 | 0.84 |
-| Forecast MAPE (7-day) | < 8% | 6.3% |
-| Fraud detection AUC-ROC | > 0.95 | 0.97 |
-| A/B test false positive rate | < 5% | 3.1% |
+Metric
 
----
+Target
 
-## Open-Source Spin-off Ideas
+Achieved
+
+Feature serving p99 latency
+
+< 5ms
+
+3.2ms
+
+Inference gateway p99 latency
+
+< 100ms
+
+67ms
+
+Recommender Recall@100
+
+> 0.85
+
+0.89
+
+Search NDCG@10
+
+> 0.82
+
+0.84
+
+Forecast MAPE (7-day)
+
+< 8%
+
+6.3%
+
+Fraud detection AUC-ROC
+
+> 0.95
+
+0.97
+
+A/B test false positive rate
+
+< 5%
+
+3.1%
+
+Open-Source Spin-off Ideas
 
 Three components from Nexus worth open-sourcing independently for GitHub stars and community credibility:
 
-**1. `nexus-fs` — Lightweight declarative feature store** (star potential: 800–1500)
+1. nexus-fs — Lightweight declarative feature store (star potential: 800–1500)
 A YAML-first feature store with point-in-time correctness, Redis online serving, and Parquet offline storage. Fills the gap between heavy Feast and hand-rolled solutions. Target audience: small-to-mid ML teams.
 
-**2. `nexus-xp` — Experimentation SDK with CUPAC** (star potential: 400–800)
+2. nexus-xp — Experimentation SDK with CUPAC (star potential: 400–800)
 CUPAC variance reduction, sequential testing with proper alpha-spending, and interleaving evaluation — all in 500 lines of pure Python + SciPy. Nothing like this exists as a clean standalone library.
 
-**3. `nexus-sim` — Marketplace ML data simulator** (star potential: 300–600)
+3. nexus-sim — Marketplace ML data simulator (star potential: 300–600)
 Generates realistic user-item interaction streams with power-law distributions, temporal drift, seasonality, and cold-start patterns. Solves the "I need production-like data to test my ML system" problem.
 
----
-
-## Interview Demo Script
+Interview Demo Script
 
 When showing this in a system design interview or portfolio review:
 
-1. **Open Grafana** → show real-time feature pipeline throughput (events/sec)
-2. **Hit the serving API** → `curl localhost:8080/recommend/user_123` → show < 100ms response
-3. **Pull up MLflow** → show experiment comparison between baseline and two-tower model
-4. **Open the A/B dashboard** → show a live experiment with CUPAC variance reduction
-5. **Trigger a retraining** → `make retrain MODEL=recommender` → show Dagster pipeline DAG
+Open Grafana → show real-time feature pipeline throughput (events/sec)
 
----
+Hit the serving API → curl localhost:8080/recommend/user_123 → show < 100ms response
 
-## References
+Pull up MLflow → show experiment comparison between baseline and two-tower model
+
+Open the A/B dashboard → show a live experiment with CUPAC variance reduction
+
+Trigger a retraining → make retrain MODEL=recommender → show Dagster pipeline DAG
+
+References
 
 This platform implements production techniques documented in:
-- [Zipline: Airbnb's ML Data Management Platform](https://www.youtube.com/watch?v=Tg5VEMEsC-0) `Airbnb`
-- [Evolution of ML Fact Store](https://netflixtechblog.com/evolution-of-ml-fact-store-5941d3231762) `Netflix`
-- [Building Riviera: Declarative Real-Time Feature Engineering](https://doordash.engineering/2021/03/04/building-a-declarative-real-time-feature-engineering-framework/) `DoorDash`
-- [Open sourcing Feathr](https://engineering.linkedin.com/blog/2022/open-sourcing-feathr---linkedin-s-feature-store-for-productive-m) `LinkedIn`
-- [RecSysOps: Best Practices for Operating a Large-Scale Recommender System](https://netflixtechblog.medium.com/recsysops-best-practices-for-operating-a-large-scale-recommender-system-95bbe195a841) `Netflix`
-- [Project RADAR: Intelligent Early Fraud Detection with Humans in the Loop](https://eng.uber.com/project-radar-intelligent-early-fraud-detection/) `Uber`
-- [Graph for Fraud Detection](https://engineering.grab.com/graph-for-fraud-detection) `Grab`
-- [Building a Gigascale ML Feature Store with Redis](https://doordash.engineering/2020/11/19/building-a-gigascale-ml-feature-store-with-redis/) `DoorDash`
 
----
+Zipline: Airbnb's ML Data Management Platform Airbnb
 
-*Built by Amogh Samadhiya as a production-grade portfolio project demonstrating staff-level ML systems engineering.*
+Evolution of ML Fact Store Netflix
+
+Building Riviera: Declarative Real-Time Feature Engineering DoorDash
+
+Open sourcing Feathr LinkedIn
+
+RecSysOps: Best Practices for Operating a Large-Scale Recommender System Netflix
+
+Project RADAR: Intelligent Early Fraud Detection with Humans in the Loop Uber
+
+Graph for Fraud Detection Grab
+
+Building a Gigascale ML Feature Store with Redis DoorDash
+
+Built by Amogh Samadhiya as a production-grade portfolio project demonstrating staff-level ML systems engineering.

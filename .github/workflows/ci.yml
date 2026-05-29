@@ -1,0 +1,6 @@
+models_export
+
+Model artefacts exported for deployment.
+Generated dynamically by Phase 2 training routines (PyTorch, LightGBM, FAISS).
+
+This folder is kept in version control to ensure the directory structure exists for the inference gateway, but the actual heavy model weights (*.pt, *.txt, *.npz) are ignored via .gitignore to prevent GitHub storage limits from being exceeded.

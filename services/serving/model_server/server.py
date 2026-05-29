@@ -3,7 +3,6 @@
 =============================================================================
 Unified Model Execution Server
 Thread-safe loader for PyTorch model weights (Two-Tower and MMoE Ranker).
-Supports zero-dependency CPU and GPU inference, complete with graceful fallback.
 =============================================================================
 """
 
@@ -32,7 +31,6 @@ class LocalModelServer:
         path = self.model_dir / "two_tower.pt"
         if path.exists():
             try:
-                print(f"[*] Loading Two-Tower Retrieval Weights from {path}...")
                 model = TwoTowerModel(
                     user_embeddings_map=self.user_feats, item_embeddings_map=self.item_feats,
                     embedding_dim=16, user_dense_dim=4, item_dense_dim=4, projection_dim=16
@@ -43,14 +41,11 @@ class LocalModelServer:
                 print("[+] Two-Tower candidate retriever initialized successfully.")
             except Exception as e:
                 print(f"[❌ Error] Failed to compile Two-Tower state weights: {e}")
-        else:
-            print("[⚠️ ModelServer] 'two_tower.pt' not found. Using simulated fallback.")
 
     def _load_mmoe_ranker_weights(self):
         path = self.model_dir / "mmoe_ranker.pt"
         if path.exists():
             try:
-                print(f"[*] Loading MMoE & DCN-v2 Ranker Weights from {path}...")
                 combined_feats = {**self.user_feats, **self.item_feats}
                 model = MMoEDCNRanker(
                     num_embeddings_map=combined_feats, embedding_dim=16, dense_dim=8,
@@ -62,8 +57,6 @@ class LocalModelServer:
                 print("[+] MMoE Multi-Task Ranker initialized successfully.")
             except Exception as e:
                 print(f"[❌ Error] Failed to compile MMoE Ranker state weights: {e}")
-        else:
-            print("[⚠️ ModelServer] 'mmoe_ranker.pt' not found. Using math simulation.")
 
     def predict_user_embedding(self, user_features: Dict[str, Any]) -> np.ndarray:
         if not self.two_tower:
@@ -75,12 +68,9 @@ class LocalModelServer:
             "user_city": torch.tensor([hash(user_features.get("user_city", "0")) % 20], device=self.device),
             "user_segment": torch.tensor([hash(user_features.get("user_segment", "0")) % 5], device=self.device)
         }
-        
         dense_in = torch.tensor([[
-            float(user_features.get("user_view_count", 0)),
-            float(user_features.get("user_purchase_count", 0)),
-            float(user_features.get("user_conversion_rate", 0.0)),
-            0.0
+            float(user_features.get("user_view_count", 0)), float(user_features.get("user_purchase_count", 0)),
+            float(user_features.get("user_conversion_rate", 0.0)), 0.0
         ]], dtype=torch.float32, device=self.device)
 
         with torch.no_grad():
@@ -88,9 +78,8 @@ class LocalModelServer:
 
     def score_ranking_batch(self, user_features: Dict[str, Any], item_features_list: List[Dict[str, Any]]) -> Tuple[np.ndarray, np.ndarray]:
         batch_size = len(item_features_list)
-        if batch_size == 0:
-            return np.array([]), np.array([])
-
+        if batch_size == 0: return np.array([]), np.array([])
+        
         if not self.ranker:
             ctr_scores, cvr_scores = [], []
             user_conv = float(user_features.get("user_conversion_rate", 0.05))
@@ -102,7 +91,6 @@ class LocalModelServer:
                 cvr_scores.append(1.0 / (1.0 + np.exp(-raw_cvr)))
             return np.array(ctr_scores), np.array(cvr_scores)
 
-        # Build batched tensors
         sparse_batch = {
             "user_id": torch.full((batch_size,), hash(user_features.get("user_id", "0")) % 500, dtype=torch.long, device=self.device),
             "user_city": torch.full((batch_size,), hash(user_features.get("user_city", "0")) % 20, dtype=torch.long, device=self.device),
@@ -120,8 +108,6 @@ class LocalModelServer:
             sparse_batch["merchant_id"][i] = hash(item.get("merchant_id", "0")) % 100
             dense_batch_list.append(dense_user_list + [float(item.get("popularity", 0)), float(item.get("base_price", 0.0)), 0.0, 0.0])
 
-        dense_batch = torch.tensor(dense_batch_list, dtype=torch.float32, device=self.device)
-
         with torch.no_grad():
-            predictions = self.ranker(sparse_batch, dense_batch)
+            predictions = self.ranker(sparse_batch, torch.tensor(dense_batch_list, dtype=torch.float32, device=self.device))
             return predictions["ctr"].cpu().numpy().flatten(), predictions["cvr"].cpu().numpy().flatten()

@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 """
 =============================================================================
-High-Performance Batched Feature Fetcher (inspired by DoorDash Riviera)
-Utilizes Redis connection pooling and non-blocking TCP pipelining to query
-and reconstruct multi-entity feature state maps in < 3ms.
+High-Performance Batched Feature Fetcher
+Retrieves serialized analytical vectors in under 5ms p99 using Redis pipelining.
 =============================================================================
 """
 
 import redis
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 
 class FeatureFetcher:
     def __init__(self, host: str = "localhost", port: int = 6379):
@@ -17,8 +16,7 @@ class FeatureFetcher:
             port=port,
             decode_responses=True,
             max_connections=100,
-            socket_timeout=0.5,
-            socket_connect_timeout=0.5
+            socket_timeout=0.5
         )
         self.r = redis.Redis(connection_pool=self.pool)
 
@@ -35,11 +33,7 @@ class FeatureFetcher:
         materialized_profiles = []
         for uid, features in zip(user_ids, raw_results):
             if not features:
-                features = {
-                    "user_view_count": "0",
-                    "user_purchase_count": "0",
-                    "user_conversion_rate": "0.0"
-                }
+                features = {"user_view_count": "0", "user_purchase_count": "0", "user_conversion_rate": "0.0"}
             features["user_id"] = uid
             materialized_profiles.append(features)
             
@@ -58,11 +52,7 @@ class FeatureFetcher:
         materialized_items = []
         for iid, features in zip(item_ids, raw_results):
             if not features:
-                features = {
-                    "category": "unknown",
-                    "base_price": "0.0",
-                    "popularity": "0"
-                }
+                features = {"category": "unknown", "base_price": "0.0", "popularity": "0"}
             features["item_id"] = iid
             materialized_items.append(features)
             
