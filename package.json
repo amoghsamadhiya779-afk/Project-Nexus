@@ -6,5 +6,8 @@
     "dev": "npm run dev --prefix ui/portal",
     "build": "npm run build --prefix ui/portal",
     "start": "npm run start --prefix ui/portal"
+  },
+  "dependencies": {
+    "next": "^15.0.3"
   }
 }
