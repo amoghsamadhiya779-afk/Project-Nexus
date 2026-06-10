@@ -1,0 +1,14 @@
+{
+  "name": "nexus-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix ui/portal",
+    "build": "npm run build --prefix ui/portal",
+    "start": "npm run start --prefix ui/portal",
+    "vercel-build": "npm install --prefix ui/portal --legacy-peer-deps && npm run build --prefix ui/portal"
+  },
+  "dependencies": {
+    "next": "^15.0.3"
+  }
+}

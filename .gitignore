@@ -141,3 +141,8 @@ Thumbs.db
 .node/
 node_modules/
 .next/
+
+# Exceptions to *.json ignore rules
+!package.json
+!package-lock.json
+!vercel.json
