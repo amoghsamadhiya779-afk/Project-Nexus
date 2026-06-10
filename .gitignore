@@ -146,3 +146,4 @@ node_modules/
 !package.json
 !package-lock.json
 !vercel.json
+!tsconfig.json

@@ -1,6 +1,5 @@
-import type { Config } from "tailwindcss";
-
-const config: Config = {
+/** @type {import('tailwindcss').Config} */
+const config = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -27,7 +26,7 @@ const config: Config = {
         btnGlow: "0 0 15px rgba(96, 165, 250, 0.3)",
       },
       animation: {
-        "scanline": "scanline 8s linear infinite",
+        scanline: "scanline 8s linear infinite",
         "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         "fade-in-up": "fadeInUp 1s cubic-bezier(0.22, 1, 0.36, 1) forwards",
       },
@@ -46,4 +45,4 @@ const config: Config = {
   plugins: [],
 };
 
-export default config;
+module.exports = config;

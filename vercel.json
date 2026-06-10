@@ -1,0 +1,7 @@
+{
+  "version": 2,
+  "framework": "nextjs",
+  "installCommand": "cd ui/portal && npm install --legacy-peer-deps",
+  "buildCommand": "cd ui/portal && npm run build",
+  "outputDirectory": "ui/portal/.next"
+}

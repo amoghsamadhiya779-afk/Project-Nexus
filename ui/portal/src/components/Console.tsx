@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Terminal, Send, Cpu, HelpCircle, Volume2, VolumeX } from "lucide-react";
+import { Terminal, Send, Cpu, Volume2, VolumeX } from "lucide-react";
 
 // --- WEB AUDIO API SCI-FI SYNTH HELPER ---
 class AudioSynth {

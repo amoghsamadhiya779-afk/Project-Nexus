@@ -2,7 +2,6 @@
 
 import React, { useRef, useEffect, useMemo } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Points, PointMaterial } from "@react-three/drei";
 import * as THREE from "three";
 import gsap from "gsap";
 
@@ -164,7 +163,7 @@ function StarField({ mouse }: { mouse: React.MutableRefObject<[number, number]> 
           args={[starData, 3]}
         />
       </bufferGeometry>
-      <pointMaterial
+      <pointsMaterial
         color="#ffffff"
         size={isMobile ? 0.045 : 0.06}
         sizeAttenuation={true}
@@ -326,15 +325,19 @@ function LineBetween({ from, to, active }: { from: THREE.Vector3; to: THREE.Vect
   const points = useMemo(() => [from, to], [from, to]);
   const geometry = useMemo(() => new THREE.BufferGeometry().setFromPoints(points), [points]);
 
-  return (
-    <line ref={lineRef} geometry={geometry}>
-      <lineBasicMaterial
-        color={active ? "#60a5fa" : "#3b82f6"}
-        transparent
-        opacity={active ? 0.35 : 0.1}
-      />
-    </line>
-  );
+  const material = useMemo(() => {
+    return new THREE.LineBasicMaterial({
+      color: active ? "#60a5fa" : "#3b82f6",
+      transparent: true,
+      opacity: active ? 0.35 : 0.1
+    });
+  }, [active]);
+
+  const line = useMemo(() => {
+    return new THREE.Line(geometry, material);
+  }, [geometry, material]);
+
+  return <primitive object={line} ref={lineRef} />;
 }
 
 // --- CAUSAL FORECASTING 3D MODEL (WAVY PARAMETRIC RIBBONS) ---
@@ -355,6 +358,19 @@ function ForecastingModel({ active }: { active: boolean }) {
   }, [isMobile]);
 
   const geometry = useMemo(() => new THREE.BufferGeometry().setFromPoints(points), [points]);
+
+  const material = useMemo(() => {
+    return new THREE.LineBasicMaterial({
+      color: active ? "#34d399" : "#059669",
+      linewidth: 2,
+      transparent: true,
+      opacity: active ? 1.0 : 0.5
+    });
+  }, [active]);
+
+  const line = useMemo(() => {
+    return new THREE.Line(geometry, material);
+  }, [geometry, material]);
 
   useFrame((state) => {
     if (meshRef.current) {
@@ -377,14 +393,7 @@ function ForecastingModel({ active }: { active: boolean }) {
 
   return (
     <group position={[modelPosX, modelPosY, 0]} scale={modelScale}>
-      <line ref={meshRef} geometry={geometry}>
-        <lineBasicMaterial
-          color={active ? "#34d399" : "#059669"}
-          linewidth={2}
-          transparent
-          opacity={active ? 1.0 : 0.5}
-        />
-      </line>
+      <primitive object={line} ref={meshRef} />
       <mesh position={[isMobile ? -1.0 : -1.5, 0, 0]}>
         <sphereGeometry args={[0.08, 6, 6]} />
         <meshBasicMaterial color="#34d399" />
@@ -468,9 +477,9 @@ function DataFlowParticles({ flowActive, onFlowComplete }: { flowActive: boolean
 
   const progress = useRef(0);
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     if (flowActive && meshRef.current) {
-      progress.current += state.delta * 0.85;
+      progress.current += delta * 0.85;
       if (progress.current >= 1.0) {
         progress.current = 0;
         onFlowComplete();
