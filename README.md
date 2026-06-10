@@ -1,4 +1,14 @@
-Nexus — Personalized Marketplace Intelligence Platform
+---
+title: Nexus-AI-Gateway
+emoji: 🪐
+colorFrom: indigo
+colorTo: blue
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
+# Nexus — Personalized Marketplace Intelligence Platform
 
 A production-grade, cloud-agnostic ML platform combining a declarative Feature Store, two-tower Recommendation System, Learning-to-Rank Search, causal multi-horizon Forecasting, graph-based Fraud Detection, and a full RecSysOps + Experimentation layer — built entirely on open-source tooling.
 
