@@ -262,7 +262,7 @@ nexus/
 │   │   ├── guardrails/         # Sequential testing + auto-stop
 │   │   └── quasi/              # DiD + synthetic control
 │   ├── serving/                # Unified inference gateway
-│   │   ├── gateway/            # FastAPI gateway + request routing
+│   │   ├── gateway/            # FastAPI gateway + request routing (Extended with CORS/Chat/Telemetry)
 │   │   ├── feature_fetcher/    # Batched Redis feature fetching
 │   │   ├── model_server/       # Model versioning + canary
 │   │   └── cache/              # Response caching layer
@@ -270,6 +270,9 @@ nexus/
 │       ├── generators/         # User, item, event generators
 │       ├── streams/            # Kafka producers
 │       └── loaders/            # Offline store loaders
+├── ui/
+│   ├── portal/                 # [NEW] Next.js 15 + R3F + GSAP immersive WebGL OS console
+│   └── app.py                  # Streamlit backup UI
 ├── sdk/                        # Python SDK for external integrations
 ├── shared/
 │   ├── schemas/                # Protobuf + Pydantic shared types
@@ -284,45 +287,33 @@ nexus/
 │   ├── integration/            # Cross-service integration tests
 │   └── e2e/                    # End-to-end scenario tests
 ├── .github/workflows/          # CI/CD pipelines
+├── Dockerfile.hf               # [NEW] Hugging Face Spaces deployment container config
+├── README.hf.md                # [NEW] Hugging Face Spaces metadata frontmatter
 ├── pyproject.toml              # Monorepo Python config
 ├── docker-compose.yaml         # Local dev stack
-└── Makefile                    # Dev automation
+└── setup_node.ps1              # [NEW] Local Node.js portable environment setup script
 
 
 Phase-by-Phase Implementation
 
 Phase 1 — Data & Feature Store (Week 1–2)
-
 Build the declarative feature pipeline with point-in-time correctness.
-
 make phase1
 
-
 Phase 2 — Models & Training (Week 3–4)
-
 Train two-tower recommender, LTR model, forecasting, fraud GNN.
-
 make phase2
 
-
-Phase 3 — Real-time Serving (Week 5–6)
-
-Deploy inference gateway with < 100ms p99 SLA.
-
+Phase 3 — Real-time Serving & WebGL Control Plane (Week 5–6)
+Deploy the inference gateway with < 100ms p99 SLA, and launch the **Nexus OS Web Portal**, providing a 3D WebGL starry universe (React Three Fiber), coordinate targeting (GSAP camera fly-throughs), and a cyber-terminal with procedurally generated sound effects (Web Audio API) proxying the FastAPI chat router.
 make phase3
 
-
 Phase 4 — Experimentation + RecSysOps (Week 7–8)
-
 Launch A/B testing platform with CUPAC variance reduction.
-
 make phase4
 
-
 Phase 5 — Monitoring & Automation (Week 9–10)
-
 Full observability stack + automatic retraining triggers.
-
 make phase5
 
 
@@ -343,11 +334,18 @@ make features
 # 5. Train all models
 make train
 
-# 6. Start serving API
-make serve
+# 6. Start serving API (FastAPI backend on port 8080)
+python -m services.serving.gateway.app
 
-# 7. Run full test suite
-make test
+# 7. Run the Next.js 15 Web Portal (on port 3000)
+# Step 7a: Bootstrap Node environment (first time only)
+powershell -ExecutionPolicy Bypass -File .\setup_node.ps1
+# Step 7b: Run dev server
+cd ui/portal
+..\..\.node\node.exe ..\..\.node\node_modules\npm\bin\npm-cli.js run dev
+
+# 8. Run full backend test suite
+pytest
 
 
 Key Success Metrics
@@ -426,6 +424,19 @@ Pull up MLflow → show experiment comparison between baseline and two-tower mod
 Open the A/B dashboard → show a live experiment with CUPAC variance reduction
 
 Trigger a retraining → make retrain MODEL=recommender → show Dagster pipeline DAG
+
+Nexus OS — Immersive WebGL Control Plane & AI Console
+
+To match the operational excellence of the backend, Nexus features a state-of-the-art interactive front-end portal (**Nexus OS**) situated in `ui/portal/`.
+
+Key UI/UX capabilities:
+- **Living 3D WebGL Background**: Procedural starry backdrop with a custom Simplex noise shader-driven nebula cloud rendered in real-time via React Three Fiber.
+- **Cinematic Camera Travel**: GSAP timelines control the camera viewport, sweeping through the space grid to isolate components when coordinates are triggered.
+- **Interactive Data Flows**: Dynamic 3D Bezier line paths trace particle streams (representing features) traveling from the Feature Store to the Recommender towers upon executing queries.
+- **Floating Command Console**: Cyber-terminal console that queries the FastAPI serving server, complete with a built-in HTML5 Web Audio API synthesizer generating tactile typing clicks and chime effects.
+- **Multi-Device Responsive Grid**: Auto Z-offset scaling in WebGL, star density throttles (1200 points) for 60 FPS mobile rendering, and responsive tablet columns.
+- **Production Deployments**: Complete configurations for Vercel (frontend hosting) and Docker-based Hugging Face Spaces (backend hosting).
+
 
 References
 
