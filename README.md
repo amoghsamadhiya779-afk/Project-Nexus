@@ -1,4 +1,14 @@
-# 🪐 Nexus: Personalized Marketplace Intelligence Platform
+---
+title: Nexus-AI-Gateway
+emoji: 🪐
+colorFrom: indigo
+colorTo: blue
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
+# Nexus: Personalized Marketplace Intelligence Platform
 
 [![Next.js 15](https://img.shields.io/badge/Next.js-15.5-black?style=flat&logo=nextdotjs)](https://nextjs.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.95+-009688?style=flat&logo=fastapi)](https://fastapi.tiangolo.com/)
@@ -10,7 +20,7 @@ Nexus is a production-grade, cloud-agnostic machine learning platform combining 
 
 ---
 
-## 💡 Why This Exists
+## Why This Exists
 
 Most machine learning portfolio projects are isolated Jupyter Notebooks operating on static CSV datasets. Nexus is built differently. It is an end-to-end, open-source reimplementation of modern, real-time architectures documented by leading tech companies:
 
@@ -23,7 +33,7 @@ Every design choice is grounded in engineering blogs and research papers from sy
 
 ---
 
-## ⚡ High-Level System Flow
+## High-Level System Flow
 
 The diagram below highlights the real-time operational loop of Nexus—from data simulation to feature engineering, candidate retrieval, ranking scoring, and HUD telemetry rendering.
 
@@ -55,7 +65,7 @@ flowchart LR
 
 ---
 
-## 🏗️ Detailed Architecture
+## Detailed Architecture
 
 This comprehensive diagram details the entire ingestion, pipeline, modeling, serving, experimentation, and MLOps layers that run inside the platform:
 
@@ -148,7 +158,7 @@ graph TB
 
 ---
 
-## 🛠️ Tech Stack & Decision Rationale
+## Tech Stack & Decision Rationale
 
 Every tool has been chosen to align directly with the production stacks used at top-tier companies.
 
@@ -170,7 +180,7 @@ Every tool has been chosen to align directly with the production stacks used at 
 
 ---
 
-## 📁 Repository Layout
+## Repository Layout
 
 The project is structured as a unified monorepo:
 
@@ -239,7 +249,7 @@ nexus/
 
 ---
 
-## 📈 Key Success Metrics
+## Key Success Metrics
 
 | Metric | Target SLA | Achieved Performance |
 | :--- | :--- | :--- |
@@ -253,7 +263,7 @@ nexus/
 
 ---
 
-## 🚀 Quickstart: Local Installation
+## Quickstart: Local Installation
 
 ### 1. Clone the Repository
 ```bash
@@ -302,7 +312,7 @@ pytest
 
 ---
 
-## 🪐 Nexus OS: Immersive WebGL Control Plane
+## Nexus OS: Immersive WebGL Control Plane
 
 To match the operational excellence of the backend, Nexus features a state-of-the-art interactive front-end portal (**Nexus OS**) situated directly in the repository root.
 
@@ -315,7 +325,7 @@ To match the operational excellence of the backend, Nexus features a state-of-th
 
 ---
 
-## 🌐 Production Deployment Setup
+## Production Deployment Setup
 
 ### 1. Backend (Hugging Face Spaces)
 The Python FastAPI serving gateway and RecSys ML models are containerized and ready to deploy on Hugging Face Spaces:
@@ -334,7 +344,7 @@ The Next.js 15 interactive portal (Nexus OS) is configured for zero-config root 
 
 ---
 
-## 📚 References & Literature
+## References & Literature
 
 This platform implements production techniques documented in:
 
