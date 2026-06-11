@@ -1,13 +1,3 @@
----
-title: Nexus-AI-Gateway
-emoji: 🪐
-colorFrom: indigo
-colorTo: blue
-sdk: docker
-app_port: 7860
-pinned: false
----
-
 # 🪐 Nexus: Personalized Marketplace Intelligence Platform
 
 [![Next.js 15](https://img.shields.io/badge/Next.js-15.5-black?style=flat&logo=nextdotjs)](https://nextjs.org/)
