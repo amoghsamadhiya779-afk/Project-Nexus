@@ -82,6 +82,14 @@ class TelemetryResponse(BaseModel):
     active_alerts: List[str]
     system_latency_p99: float
 
+@app.get("/")
+def read_root():
+    return {
+        "status": "Nexus OS Core Backend is Online",
+        "docs_url": "/docs",
+        "message": "This is the inference gateway. The Next.js frontend is hosted on Vercel."
+    }
+
 @app.post("/recommend", response_model=RecommendationResponse)
 def get_recommendations(request: RecommendationRequest):
     start_time = time.perf_counter()
