@@ -94,13 +94,24 @@ export default function Home() {
       duration: 1.0,
       ease: "power3.out",
     }, "-=0.8");
+    
+    // 1.5 Fade out hero text so it doesn't block the UI
+    tl.to(heroRef.current, {
+      opacity: 0,
+      filter: "blur(10px)",
+      duration: 1.0,
+      ease: "power2.inOut",
+      onComplete: () => {
+        if (heroRef.current) heroRef.current.style.display = "none";
+      }
+    }, "+=1.2");
 
     // 2. Main interface fades into existence
     tl.to(overlayRef.current, {
       opacity: 1,
       duration: 1.4,
       ease: "cubic-bezier(0.22, 1, 0.36, 1)",
-    }, "-=0.3");
+    }, "-=0.5");
 
     // 3. Slide camera slowly into position
     setActiveSubsystem("overview");
