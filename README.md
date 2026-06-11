@@ -8,18 +8,68 @@ app_port: 7860
 pinned: false
 ---
 
-# Nexus — Personalized Marketplace Intelligence Platform
+# 🪐 Nexus: Personalized Marketplace Intelligence Platform
 
-A production-grade, cloud-agnostic ML platform combining a declarative Feature Store, two-tower Recommendation System, Learning-to-Rank Search, causal multi-horizon Forecasting, graph-based Fraud Detection, and a full RecSysOps + Experimentation layer — built entirely on open-source tooling.
+[![Next.js 15](https://img.shields.io/badge/Next.js-15.5-black?style=flat&logo=nextdotjs)](https://nextjs.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.95+-009688?style=flat&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![Docker SDK](https://img.shields.io/badge/Docker-Spaces--SDK-blue?style=flat&logo=docker)](https://huggingface.co/docs/hub/spaces-sdks-docker)
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Deploy-black?style=flat&logo=vercel)](https://vercel.com/)
+[![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.12-blue?style=flat&logo=python)](https://www.python.org/)
 
-Why This Exists
+Nexus is a production-grade, cloud-agnostic machine learning platform combining a declarative Feature Store, a two-tower candidate recommendation engine, Learning-to-Rank (LTR) search, causal forecasting, graph-based fraud networks, and a complete RecSysOps lifecycle framework.
 
-Most "ML portfolio projects" are Jupyter notebooks with a scikit-learn model and a CSV. Nexus is not that. It is a faithful open-source reimplementation of the production architectures documented in applied-ml — Airbnb's Zipline declarative feature pipelines, Netflix's Fact Store + RecSysOps, LinkedIn's Feathr + DARWIN experimentation, DoorDash's Riviera real-time feature engineering, Uber's causal forecasting, and Pinterest's GPU embedding inference.
+---
 
-Every design decision is grounded in a published engineering blog post or paper from a company that runs this at scale.
+## 💡 Why This Exists
 
-Architecture
+Most machine learning portfolio projects are isolated Jupyter Notebooks operating on static CSV datasets. Nexus is built differently. It is an end-to-end, open-source reimplementation of modern, real-time architectures documented by leading tech companies:
 
+* **Zipline & Feathr (Airbnb/LinkedIn)**: Declarative, point-in-time correct batch & streaming feature store pipelines.
+* **Fact Store & RecSysOps (Netflix)**: Comprehensive observation tracking, telemetry, A/B experimentation, and model evaluation.
+* **Riviera & Gigascale Cache (DoorDash)**: Stream processing pipelines with sub-5ms Redis online serving latency.
+* **Causal Forecasting (Uber)**: Multi-horizon hierarchical projections combined with intervention analysis.
+
+Every design choice is grounded in engineering blogs and research papers from systems operating at staff scale.
+
+---
+
+## ⚡ High-Level System Flow
+
+The diagram below highlights the real-time operational loop of Nexus—from data simulation to feature engineering, candidate retrieval, ranking scoring, and HUD telemetry rendering.
+
+```mermaid
+flowchart LR
+    subgraph INGESTION["Ingestion Layer"]
+        A[Data Simulator] -->|User/Item Streams| B(Kafka / Redpanda)
+    end
+    
+    subgraph FEATURE_STORE["Nexus-FS Store"]
+        B -->|Flink Stream| C[(Redis Online Store)]
+        A -->|Parquet Logs| D[(PostgreSQL Offline)]
+    end
+    
+    subgraph INFERENCE["Serving Gateway"]
+        C -->|Feature Profiles| E[FastAPI Gateway]
+        F[FAISS Candidate Retriever] -->|Top Candidates| E
+        G[MMoE / LTR Ranker] -->|Scored Rankings| E
+    end
+    
+    subgraph WEB["WebGL Control Plane"]
+        E -->|Real-time Telemetry| H[Nexus OS HUD Portal]
+    end
+
+    style FEATURE_STORE fill:#111827,stroke:#3b82f6,color:#fff
+    style INFERENCE fill:#111827,stroke:#10b981,color:#fff
+    style WEB fill:#111827,stroke:#8b5cf6,color:#fff
+```
+
+---
+
+## 🏗️ Detailed Architecture
+
+This comprehensive diagram details the entire ingestion, pipeline, modeling, serving, experimentation, and MLOps layers that run inside the platform:
+
+```mermaid
 graph TB
     subgraph INGESTION["Data Ingestion Layer"]
         SIM[Data Simulator<br/>10M+ events] --> KAFKA[Kafka / Redpanda<br/>Streaming Bus]
@@ -104,142 +154,37 @@ graph TB
     style SERVING fill:#4a1942,color:#fff
     style EXPERIMENT fill:#3d2e00,color:#fff
     style MLOPS fill:#2d1515,color:#fff
+```
 
+---
 
-Tech Stack Justification
+## 🛠️ Tech Stack & Decision Rationale
 
-Every tool chosen for portability, maturity, and direct correspondence to production systems at top-tier companies.
+Every tool has been chosen to align directly with the production stacks used at top-tier companies.
 
-Layer
+| Layer | Tool | Decision Rationale | Industry Inspiration |
+| :--- | :--- | :--- | :--- |
+| **Streaming** | Redpanda / Kafka | Battle-tested, cloud-agnostic event logging pipeline | DoorDash, Uber |
+| **Stream Processing** | Apache Flink | Exactly-once stateful processing, window joins, aggregations | DoorDash Riviera |
+| **Batch Processing** | DuckDB + Spark | DuckDB for lightweight local processing; Spark for scale-out ETL | Airbnb Zipline |
+| **Online Storage** | Redis | Sub-5ms user profile vector reads via pipeline batching | DoorDash Feature Store |
+| **Offline Storage** | PostgreSQL + Parquet | Point-in-time analytical logs supporting offline time-travel | Netflix Fact Store |
+| **Feature Registry** | Custom (Nexus-FS) | Declarative configuration-as-code, lineage, and metadata tracking | LinkedIn Feathr |
+| **Vector Search** | FAISS + Hnswlib | Ultra-fast GPU-accelerated candidate retrieval index | Pinterest, Netflix |
+| **Model Training** | Ray + PyTorch | Distributed deep learning parameter training | Uber, Pinterest |
+| **Model Serving** | FastAPI + Triton | High-throughput asynchronous serving + versioned runtime | NVIDIA, Pinterest |
+| **MLOps Registry** | MLflow | Central model parameter registry, run metrics, and artifacts | Zynga, DoorDash |
+| **Orchestration** | Dagster | Asset-based orchestration DAGs with native observability | Netflix Metaflow |
+| **Observability** | Prometheus + Grafana | System telemetry metrics, alert definitions, and dashboard grids | Uber, Airbnb |
+| **Frontend UI** | Next.js 15 + R3F + GSAP | Premium WebGL control plane console mapping system telemetry | Universal |
 
-Tool
+---
 
-Why
+## 📁 Repository Layout
 
-Inspired by
+The project is structured as a unified monorepo:
 
-Streaming
-
-Kafka / Redpanda
-
-Battle-tested, cloud-agnostic, drop-in compatible
-
-DoorDash, Uber, LinkedIn
-
-Stream processing
-
-Apache Flink
-
-Exactly-once semantics, stateful windows, joins
-
-DoorDash Riviera
-
-Batch processing
-
-DuckDB + Spark
-
-DuckDB for local dev, Spark for scale-out
-
-Airbnb Zipline, Sputnik
-
-Online store
-
-Redis
-
-Sub-5ms feature lookup, pipeline batching
-
-DoorDash Gigascale Feature Store
-
-Offline store
-
-PostgreSQL + Parquet
-
-Point-in-time joins, time-travel queries
-
-Netflix Fact Store
-
-Feature registry
-
-Custom (Nexus-FS)
-
-Declarative YAML, lineage tracking
-
-Airbnb Zipline, LinkedIn Feathr
-
-Vector search
-
-FAISS + Hnswlib
-
-GPU-accelerated ANN, production-tested
-
-Pinterest, Netflix
-
-Model training
-
-Ray + PyTorch
-
-Distributed, cloud-agnostic
-
-Uber, Pinterest
-
-Model registry
-
-MLflow
-
-OSS standard, UI + API
-
-Zynga, DoorDash
-
-Orchestration
-
-Dagster
-
-Asset-based lineage, great observability
-
-Netflix Metaflow-inspired
-
-Serving
-
-FastAPI + Triton
-
-Async, GPU inference, model versioning
-
-NVIDIA, Pinterest
-
-Observability
-
-Prometheus + Grafana
-
-Industry standard, pull-based, no lock-in
-
-Uber, Airbnb
-
-Data quality
-
-Great Expectations
-
-Declarative expectations, CI integration
-
-Airbnb data quality
-
-Experimentation
-
-Custom (Nexus-XP)
-
-CUPAC, interleaving, sequential testing
-
-Netflix, LinkedIn
-
-Infrastructure
-
-Kubernetes + Helm
-
-Cloud-agnostic, operator-based
-
-Universal
-
-Monorepo Structure
-
+```
 nexus/
 ├── services/
 │   ├── feature_store/          # Nexus-FS: declarative feature pipelines
@@ -272,11 +217,11 @@ nexus/
 │   │   ├── guardrails/         # Sequential testing + auto-stop
 │   │   └── quasi/              # DiD + synthetic control
 │   └── serving/                # Unified inference gateway
-│       ├── gateway/            # FastAPI gateway + request routing (Extended with CORS/Chat/Telemetry)
+│       ├── gateway/            # FastAPI gateway + request routing
 │       ├── feature_fetcher/    # Batched Redis feature fetching
 │       ├── model_server/       # Model versioning + canary
 │       └── cache/              # Response caching layer
-├── src/                        # [NEW] Next.js 15 Web Portal source code
+├── src/                        # Next.js 15 Web Portal source code (Nexus OS)
 │   ├── app/                    # App Router pages, metadata, and globals
 │   └── components/             # Starfield WebGL canvas & OS Console components
 ├── package.json                # Frontend package manifest & scripts
@@ -295,196 +240,119 @@ nexus/
 │   ├── kubernetes/             # Helm charts + K8s manifests
 │   └── terraform/              # IaC for generic K8s cluster
 ├── tests/
-│   ├── unit/                   # Per-service unit tests
-│   ├── integration/            # Cross-service integration tests
-│   └── e2e/                    # End-to-end scenario tests
-├── .github/workflows/          # CI/CD pipelines
-├── Dockerfile                  # [NEW] Hugging Face Spaces deployment container config
-├── README.hf.md                # [NEW] Hugging Face Spaces metadata frontmatter
+│   └── unit/                   # Backend unit tests
+├── Dockerfile                  # Hugging Face Spaces deployment container config
 ├── pyproject.toml              # Monorepo Python config
 ├── docker-compose.yaml         # Local dev stack
-└── setup_node.ps1              # [NEW] Local Node.js portable environment setup script
+└── setup_node.ps1              # Local Node.js portable environment setup script
+```
 
+---
 
-Phase-by-Phase Implementation
+## 📈 Key Success Metrics
 
-Phase 1 — Data & Feature Store (Week 1–2)
-Build the declarative feature pipeline with point-in-time correctness.
-make phase1
+| Metric | Target SLA | Achieved Performance |
+| :--- | :--- | :--- |
+| **Feature serving p99 latency** | `< 5ms` | **3.2ms** |
+| **Inference gateway p99 latency** | `< 100ms` | **67ms** |
+| **Recommender Recall@100** | `> 0.85` | **0.89** |
+| **Search NDCG@10** | `> 0.82` | **0.84** |
+| **Forecast MAPE (7-day)** | `< 8%` | **6.3%** |
+| **Fraud detection AUC-ROC** | `> 0.95` | **0.97** |
+| **A/B test false positive rate** | `< 5%` | **3.1%** |
 
-Phase 2 — Models & Training (Week 3–4)
-Train two-tower recommender, LTR model, forecasting, fraud GNN.
-make phase2
+---
 
-Phase 3 — Real-time Serving & WebGL Control Plane (Week 5–6)
-Deploy the inference gateway with < 100ms p99 SLA, and launch the **Nexus OS Web Portal**, providing a 3D WebGL starry universe (React Three Fiber), coordinate targeting (GSAP camera fly-throughs), and a cyber-terminal with procedurally generated sound effects (Web Audio API) proxying the FastAPI chat router.
-make phase3
+## 🚀 Quickstart: Local Installation
 
-Phase 4 — Experimentation + RecSysOps (Week 7–8)
-Launch A/B testing platform with CUPAC variance reduction.
-make phase4
+### 1. Clone the Repository
+```bash
+git clone https://github.com/amoghsamadhiya779-afk/Project-Nexus.git
+cd Project-Nexus
+```
 
-Phase 5 — Monitoring & Automation (Week 9–10)
-Full observability stack + automatic retraining triggers.
-make phase5
-
-
-Quickstart
-
-# 1. Clone
-git clone https://github.com/amoghsamadhiya779-afk/Project-Nexus.git && cd Project-Nexus
-
-# 2. Start local stack (Kafka, Redis, PostgreSQL, MLflow, Grafana)
+### 2. Launch local dev services (Docker compose)
+Start Redpanda, Redis, PostgreSQL, MLflow, and Grafana:
+```bash
 make dev-up
+```
 
-# 3. Generate 1M synthetic events
+### 3. Generate interactions & materialize features
+```bash
+# Generate 1M synthetic events
 make simulate N=1000000
 
-# 4. Materialise features
+# Write feature profiles to online Redis & offline store
 make features
+```
 
-# 5. Train all models
+### 4. Train RecSys & Search models
+```bash
 make train
+```
 
-# 6. Start serving API (FastAPI backend on port 8080)
+### 5. Start serving API (FastAPI backend on port 8080)
+```bash
 python -m services.serving.gateway.app
+```
 
-# 7. Run the Next.js 15 Web Portal (on port 3000)
-# Step 7a: Bootstrap Node environment (first time only)
+### 6. Run the Next.js 15 Web Portal (on port 3000/3001)
+```powershell
+# Step 6a: Bootstrap Node environment (first time only)
 powershell -ExecutionPolicy Bypass -File .\setup_node.ps1
-# Step 7b: Run dev server from root directory
+
+# Step 6b: Run dev server
 .node\node.exe .node\node_modules\npm\bin\npm-cli.js run dev
+```
 
-# 8. Run full backend test suite
+### 7. Run backend tests
+```bash
 pytest
+```
 
+---
 
-Key Success Metrics
+## 🪐 Nexus OS: Immersive WebGL Control Plane
 
-Metric
+To match the operational excellence of the backend, Nexus features a state-of-the-art interactive front-end portal (**Nexus OS**) situated directly in the repository root.
 
-Target
+**Key UI/UX capabilities:**
+* **Living 3D WebGL Background**: Procedural starry backdrop with a custom Simplex noise shader-driven nebula cloud rendered in real-time via React Three Fiber.
+* **Cinematic Camera Travel**: GSAP timelines control the camera viewport, sweeping through the space grid to isolate components when coordinates are triggered.
+* **Interactive Data Flows**: Dynamic 3D Bezier line paths trace particle streams (representing features) traveling from the Feature Store to the Recommender towers upon executing queries.
+* **Floating Command Console**: Cyber-terminal console that queries the FastAPI serving server, complete with a built-in HTML5 Web Audio API synthesizer generating tactile typing clicks and chime effects.
+* **Multi-Device Responsive Grid**: Auto Z-offset scaling in WebGL, star density throttles (1200 points) for 60 FPS mobile rendering, and responsive tablet columns.
 
-Achieved
+---
 
-Feature serving p99 latency
+## 🌐 Production Deployment Setup
 
-< 5ms
-
-3.2ms
-
-Inference gateway p99 latency
-
-< 100ms
-
-67ms
-
-Recommender Recall@100
-
-> 0.85
-
-0.89
-
-Search NDCG@10
-
-> 0.82
-
-0.84
-
-Forecast MAPE (7-day)
-
-< 8%
-
-6.3%
-
-Fraud detection AUC-ROC
-
-> 0.95
-
-0.97
-
-A/B test false positive rate
-
-< 5%
-
-3.1%
-
-Open-Source Spin-off Ideas
-
-Three components from Nexus worth open-sourcing independently for GitHub stars and community credibility:
-
-1. nexus-fs — Lightweight declarative feature store (star potential: 800–1500)
-A YAML-first feature store with point-in-time correctness, Redis online serving, and Parquet offline storage. Fills the gap between heavy Feast and hand-rolled solutions. Target audience: small-to-mid ML teams.
-
-2. nexus-xp — Experimentation SDK with CUPAC (star potential: 400–800)
-CUPAC variance reduction, sequential testing with proper alpha-spending, and interleaving evaluation — all in 500 lines of pure Python + SciPy. Nothing like this exists as a clean standalone library.
-
-3. nexus-sim — Marketplace ML data simulator (star potential: 300–600)
-Generates realistic user-item interaction streams with power-law distributions, temporal drift, seasonality, and cold-start patterns. Solves the "I need production-like data to test my ML system" problem.
-
-Interview Demo Script
-
-When showing this in a system design interview or portfolio review:
-
-Open Grafana → show real-time feature pipeline throughput (events/sec)
-
-Hit the serving API → curl localhost:8080/recommend/user_123 → show < 100ms response
-
-Pull up MLflow → show experiment comparison between baseline and two-tower model
-
-Open the A/B dashboard → show a live experiment with CUPAC variance reduction
-
-Trigger a retraining → make retrain MODEL=recommender → show Dagster pipeline DAG
-
-Nexus OS — Immersive WebGL Control Plane & AI Console
-
-To match the operational excellence of the backend, Nexus features a state-of-the-art interactive front-end portal (**Nexus OS**) situated directly in the repository root directory `/`.
-
-Key UI/UX capabilities:
-- **Living 3D WebGL Background**: Procedural starry backdrop with a custom Simplex noise shader-driven nebula cloud rendered in real-time via React Three Fiber.
-- **Cinematic Camera Travel**: GSAP timelines control the camera viewport, sweeping through the space grid to isolate components when coordinates are triggered.
-- **Interactive Data Flows**: Dynamic 3D Bezier line paths trace particle streams (representing features) traveling from the Feature Store to the Recommender towers upon executing queries.
-- **Floating Command Console**: Cyber-terminal console that queries the FastAPI serving server, complete with a built-in HTML5 Web Audio API synthesizer generating tactile typing clicks and chime effects.
-- **Multi-Device Responsive Grid**: Auto Z-offset scaling in WebGL, star density throttles (1200 points) for 60 FPS mobile rendering, and responsive tablet columns.
-- **Production Deployments**: Complete configurations for Vercel (frontend hosting) and Docker-based Hugging Face Spaces (backend hosting).
-
-### Production Deployment Setup
-
-#### 1. Backend (Hugging Face Spaces)
+### 1. Backend (Hugging Face Spaces)
 The Python FastAPI serving gateway and RecSys ML models are containerized and ready to deploy on Hugging Face Spaces:
-- Create a new Space on [Hugging Face](https://huggingface.co/new-space).
-- Select **Docker** as the SDK.
-- Push the repository to the Space git remote. Hugging Face will automatically parse the root [README.md](file:///c:/Users/Lenovo/Desktop/Project%20Nexus/README.md) YAML frontmatter, build the root [Dockerfile](file:///c:/Users/Lenovo/Desktop/Project%20Nexus/Dockerfile), and deploy the gateway on port `7860`.
+1. Create a new Space on [Hugging Face](https://huggingface.co/new-space).
+2. Select **Docker** as the SDK.
+3. Push the repository to the Space git remote. Hugging Face will automatically parse the root [README.md](file:///c:/Users/Lenovo/Desktop/Project%20Nexus/README.md) YAML frontmatter, build the root [Dockerfile](file:///c:/Users/Lenovo/Desktop/Project%20Nexus/Dockerfile), and deploy the gateway on port `7860`.
 
-#### 2. Frontend (Vercel)
+### 2. Frontend (Vercel)
 The Next.js 15 interactive portal (Nexus OS) is configured for zero-config root deployment on Vercel:
-- Link the repository to your [Vercel](https://vercel.com) account.
-- Leave the **Root Directory** setting as default `./` (the repository root). Vercel will auto-detect the Next.js app in the root directory.
-- Add the Environment Variable:
-  - **Key**: `NEXT_PUBLIC_API_URL`
-  - **Value**: Your live Hugging Face Space URL (e.g., `https://your-space-name.hf.space`).
-- Click **Deploy**. Vercel will build and host the Next.js application, proxying telemetry and console commands directly to your Hugging Face gateway.
+1. Link the repository to your [Vercel](https://vercel.com) account.
+2. Leave the **Root Directory** setting as default `./` (the repository root). Vercel will auto-detect the Next.js app in the root directory.
+3. Add the Environment Variable:
+   * **Key**: `NEXT_PUBLIC_API_URL`
+   * **Value**: Your live Hugging Face Space URL (e.g., `https://your-space-name.hf.space`).
+4. Click **Deploy**. Vercel will build and host the Next.js application, proxying telemetry and console commands directly to your Hugging Face gateway.
 
+---
 
-
-References
+## 📚 References & Literature
 
 This platform implements production techniques documented in:
 
-Zipline: Airbnb's ML Data Management Platform Airbnb
-
-Evolution of ML Fact Store Netflix
-
-Building Riviera: Declarative Real-Time Feature Engineering DoorDash
-
-Open sourcing Feathr LinkedIn
-
-RecSysOps: Best Practices for Operating a Large-Scale Recommender System Netflix
-
-Project RADAR: Intelligent Early Fraud Detection with Humans in the Loop Uber
-
-Graph for Fraud Detection Grab
-
-Building a Gigascale ML Feature Store with Redis DoorDash
-
-Built by Amogh Samadhiya as a production-grade portfolio project demonstrating staff-level ML systems engineering.
+* **Zipline**: [Airbnb's ML Data Management Platform](https://appliedml.com/blog/zipline-airbnbs-machine-learning-data-management-platform)
+* **Fact Store**: [Evolution of ML Fact Store at Netflix](https://netflixtechblog.com/building-netflixs-recommendation-engine-on-ml-fact-store-6202472d8a50)
+* **Riviera**: [Declarative Real-Time Feature Engineering at DoorDash](https://doordash.engineering/2020/09/02/building-riviera-declarative-real-time-feature-engineering/)
+* **Feathr**: [Open Sourcing Feathr: LinkedIn's Feature Store](https://engineering.linkedin.com/blog/2022/feathr-linkedin-feature-store)
+* **RecSysOps**: [Best Practices for Operating Recommender Systems at Netflix](https://netflixtechblog.com/recsysops-best-practices-for-operating-a-large-scale-recommender-system-862023bf89f)
+* **Radar**: [Intelligent Fraud Detection with HITL at Uber](https://eng.uber.com/radar-intelligent-fraud-detection/)
+* **GNN Fraud**: [Graph for Fraud Anomaly Detection at Grab](https://engineering.grab.com/graph-based-fraud-detection)
+* **Redis Feature Store**: [Building a Gigascale ML Feature Store with Redis at DoorDash](https://doordash.engineering/2021/03/16/building-a-gigascale-ml-feature-store-with-redis/)
