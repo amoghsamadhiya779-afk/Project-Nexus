@@ -448,6 +448,24 @@ Key UI/UX capabilities:
 - **Multi-Device Responsive Grid**: Auto Z-offset scaling in WebGL, star density throttles (1200 points) for 60 FPS mobile rendering, and responsive tablet columns.
 - **Production Deployments**: Complete configurations for Vercel (frontend hosting) and Docker-based Hugging Face Spaces (backend hosting).
 
+### Production Deployment Setup
+
+#### 1. Backend (Hugging Face Spaces)
+The Python FastAPI serving gateway and RecSys ML models are containerized and ready to deploy on Hugging Face Spaces:
+- Create a new Space on [Hugging Face](https://huggingface.co/new-space).
+- Select **Docker** as the SDK.
+- Push the repository to the Space git remote. Hugging Face will automatically parse the root [README.md](file:///c:/Users/Lenovo/Desktop/Project%20Nexus/README.md) YAML frontmatter, build the root [Dockerfile](file:///c:/Users/Lenovo/Desktop/Project%20Nexus/Dockerfile), and deploy the gateway on port `7860`.
+
+#### 2. Frontend (Vercel)
+The Next.js 15 interactive portal (Nexus OS) is configured for zero-config root deployment on Vercel:
+- Link the repository to your [Vercel](https://vercel.com) account.
+- Leave the **Root Directory** setting as default `./` (the repository root). Vercel will auto-detect the Next.js app in the root directory.
+- Add the Environment Variable:
+  - **Key**: `NEXT_PUBLIC_API_URL`
+  - **Value**: Your live Hugging Face Space URL (e.g., `https://your-space-name.hf.space`).
+- Click **Deploy**. Vercel will build and host the Next.js application, proxying telemetry and console commands directly to your Hugging Face gateway.
+
+
 
 References
 
