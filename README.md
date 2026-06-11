@@ -271,18 +271,20 @@ nexus/
 │   │   ├── metrics/            # CUPAC variance reduction + power analysis
 │   │   ├── guardrails/         # Sequential testing + auto-stop
 │   │   └── quasi/              # DiD + synthetic control
-│   ├── serving/                # Unified inference gateway
-│   │   ├── gateway/            # FastAPI gateway + request routing (Extended with CORS/Chat/Telemetry)
-│   │   ├── feature_fetcher/    # Batched Redis feature fetching
-│   │   ├── model_server/       # Model versioning + canary
-│   │   └── cache/              # Response caching layer
-│   └── data_simulator/         # 10M+ event generator
-│       ├── generators/         # User, item, event generators
-│       ├── streams/            # Kafka producers
-│       └── loaders/            # Offline store loaders
-├── ui/
-│   ├── portal/                 # [NEW] Next.js 15 + R3F + GSAP immersive WebGL OS console
-│   └── app.py                  # Streamlit backup UI
+│   └── serving/                # Unified inference gateway
+│       ├── gateway/            # FastAPI gateway + request routing (Extended with CORS/Chat/Telemetry)
+│       ├── feature_fetcher/    # Batched Redis feature fetching
+│       ├── model_server/       # Model versioning + canary
+│       └── cache/              # Response caching layer
+├── src/                        # [NEW] Next.js 15 Web Portal source code
+│   ├── app/                    # App Router pages, metadata, and globals
+│   └── components/             # Starfield WebGL canvas & OS Console components
+├── package.json                # Frontend package manifest & scripts
+├── tailwind.config.js          # Tailwind styling layout
+├── tsconfig.json               # TypeScript config
+├── next.config.js              # Next.js configurations & routing rewrites
+├── postcss.config.js           # PostCSS compiler config
+├── .npmrc                      # legacy-peer-deps=true config
 ├── sdk/                        # Python SDK for external integrations
 ├── shared/
 │   ├── schemas/                # Protobuf + Pydantic shared types
@@ -297,7 +299,7 @@ nexus/
 │   ├── integration/            # Cross-service integration tests
 │   └── e2e/                    # End-to-end scenario tests
 ├── .github/workflows/          # CI/CD pipelines
-├── Dockerfile.hf               # [NEW] Hugging Face Spaces deployment container config
+├── Dockerfile                  # [NEW] Hugging Face Spaces deployment container config
 ├── README.hf.md                # [NEW] Hugging Face Spaces metadata frontmatter
 ├── pyproject.toml              # Monorepo Python config
 ├── docker-compose.yaml         # Local dev stack
@@ -350,9 +352,8 @@ python -m services.serving.gateway.app
 # 7. Run the Next.js 15 Web Portal (on port 3000)
 # Step 7a: Bootstrap Node environment (first time only)
 powershell -ExecutionPolicy Bypass -File .\setup_node.ps1
-# Step 7b: Run dev server
-cd ui/portal
-..\..\.node\node.exe ..\..\.node\node_modules\npm\bin\npm-cli.js run dev
+# Step 7b: Run dev server from root directory
+.node\node.exe .node\node_modules\npm\bin\npm-cli.js run dev
 
 # 8. Run full backend test suite
 pytest
@@ -437,7 +438,7 @@ Trigger a retraining → make retrain MODEL=recommender → show Dagster pipelin
 
 Nexus OS — Immersive WebGL Control Plane & AI Console
 
-To match the operational excellence of the backend, Nexus features a state-of-the-art interactive front-end portal (**Nexus OS**) situated in `ui/portal/`.
+To match the operational excellence of the backend, Nexus features a state-of-the-art interactive front-end portal (**Nexus OS**) situated directly in the repository root directory `/`.
 
 Key UI/UX capabilities:
 - **Living 3D WebGL Background**: Procedural starry backdrop with a custom Simplex noise shader-driven nebula cloud rendered in real-time via React Three Fiber.
